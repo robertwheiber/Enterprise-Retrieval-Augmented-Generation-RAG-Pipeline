@@ -26,13 +26,14 @@
 
 ## Core Implementation Highlights
 
+# Python Code
+
 ## 1. Automated Document Ingestion & Precision Chunking
 
-# Python Code
 from langchain_community.document_loaders import GCSDirectoryLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-# 1. Extract PDFs from Google Cloud Storage
+ 1. Extract PDFs from Google Cloud Storage
 BUCKET_URI = "your-gcs-bucket-uri"
 folder_prefix = "documents/pdfs/"
 
@@ -44,7 +45,7 @@ loader = GCSDirectoryLoader(
 all_documents = loader.load()
 print(f"Processing documents from gs://{BUCKET_URI}/{folder_prefix}")
 
-# 2. Precision Chunking for LLM Context Windows
+ 2. Precision Chunking for LLM Context Windows
 text_splitter = RecursiveCharacterTextSplitter(
     chunk_size=1000, 
     chunk_overlap=100
@@ -56,10 +57,10 @@ Deploys highly scalable GCP vector stores optimized for rapid semantic search.
 
 from google.cloud import aiplatform
 
-# Initialize Vertex AI Environment
+ Initialize Vertex AI Environment
 aiplatform.init(project=PROJECT_ID, location=REGION, staging_bucket=BUCKET_URI)
 
-# Configure the Vector Search Index with optimized parameters
+ Configure the Vector Search Index with optimized parameters
 my_index = aiplatform.MatchingEngineIndex.create_tree_ah_index(
     display_name="adta5770_enterprise_index",
     dimensions=768, # Aligned with text-embedding-004
@@ -68,7 +69,7 @@ my_index = aiplatform.MatchingEngineIndex.create_tree_ah_index(
     leaf_node_embedding_count=500, # Optimized for retrieval latency
 )
 
-# Deploy the index to a public endpoint
+ Deploy the index to a public endpoint
 my_index_endpoint = aiplatform.MatchingEngineIndexEndpoint.create(
     display_name="adta5770_qasearch_endpoint",
     public_endpoint_enabled=True
@@ -84,22 +85,22 @@ Connects the vector database to the generative model to synthesize zero-hallucin
 from langchain_google_vertexai import VertexAIEmbeddings, VertexAI
 from langchain_classic.chains.combine_documents import create_stuff_documents_chain
 
-# Initialize Google's Text Embedding Model
+ Initialize Google's Text Embedding Model
 embeddings = VertexAIEmbeddings(model_name="text-embedding-004")
 
-# Configure Vertex AI Vector Search as the LangChain Retriever
+ Configure Vertex AI Vector Search as the LangChain Retriever
 retriever = vsvectordb.as_retriever(
     search_type="similarity",
     search_kwargs={"k": 5} # Retrieve top 5 most relevant chunks
 )
 
-# Initialize the Generative Model
+ Initialize the Generative Model
 llm = VertexAI(model_name="gemini-2.5-pro", temperature=0.2)
 
-# Create the final document-combining chain
+ Create the final document-combining chain
 combine_docs_chain = create_stuff_documents_chain(llm, qa_prompt)
 
-# Example Execution
+ Example Execution
 response = combine_docs_chain.invoke({
     "input_documents": retrieved_docs, 
     "question": "What are the core compliance protocols outlined in the uploaded SOPs?"
