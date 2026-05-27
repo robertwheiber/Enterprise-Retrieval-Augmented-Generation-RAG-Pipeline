@@ -121,4 +121,4 @@ o  Established standard operating procedures for cleaning, indexing, and undeplo
 
 3  Execute the Jupyter Notebook cells sequentially to deploy the endpoint, index the embeddings, and initialize the LangChain QA retriever.
 
-4  To finalize this for your portfolio, create a new repository on GitHub (e.g., Enterprise-VertexAI-RAG), upload the .ipynb file to it, and paste this exact text into the README.md file.
+
